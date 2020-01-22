@@ -1,0 +1,61 @@
+/*
+	
+	Creator:	Patrick Griffin
+	Date:		9/6/2018
+
+*/
+
+Main module
+
+Declare integer lowestNum = 0;
+Declare integer highestNum = 100;
+Declare boolean correctGuess = false;
+Declare integer attempts = 0;
+Declare integer compGuess;
+Declare integer userDecision;
+
+Construct scanner for user input
+
+Display "You are to select a number between 0 - 100 for the computer to guess."
+
+Computer makes its first attempt compGuess = highestNum / 2;
+Increment attempt++
+
+Display "Is your number ", compGuess, "?"
+Display "Enter" 
+Display "1) if this was a correct guess."
+Display "2) if your number is higher."
+Display "3) if your number is lower."
+
+Input userDecision
+
+If userDecision == 1 
+	Set correctGuess = true
+
+While (!correctGuess)
+	
+	if userDecision == 2
+		Set lowestNum = compGuess
+
+	else
+		Set highestNum = compGuess
+
+	make new guess
+	compGuess = (lowestGuess + highestGuess) / 2
+	Increment attempts++
+
+	Display "Is your number ", compGuess, "?"
+	Display "Enter" 
+	Display "1) if this was a correct guess."
+	Display "2) if your number is higher."
+	Display "3) if your number is lower."
+
+	Input userDecision
+
+	If userDecision == 1 
+	Set correctGuess = true
+
+End While
+
+Display "Thanks for playing"
+Display "It took the computer ", attempts, " to guess your number."

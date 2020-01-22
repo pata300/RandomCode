@@ -12,7 +12,7 @@ import java.util.Observable;
 
     Link to the java API by adding the `-link https://docs.oracle.com/javase/8/docs/api/` option as well.
 */
-public class PokemonTrainer implements Observer {
+public class PokemonTrainer implements MyObserver {
 
     private String myName; /** @invariant myName != "" */
     
@@ -39,9 +39,9 @@ public class PokemonTrainer implements Observer {
     /**
         {@inheritdoc}
     */
-    public void update(Observable obs, Object o) {
+    public void update(MyObservable obs, Object o) {
         String whatHappened = "";
-        whatHappened += this + " is notified that " + o; //test this
+        whatHappened += this + " is notified that " + o;
         System.out.println(whatHappened);
     }
 
@@ -50,7 +50,7 @@ public class PokemonTrainer implements Observer {
     */
     public String toString() {
         String returnval = "";
-        returnval += "PokemonTrainer " + myName; //test this
+        returnval += "PokemonTrainer " + myName;
         return returnval;
     }
 

@@ -11,7 +11,7 @@ import java.util.Observable;
 
     Link to the java API by adding the `-link https://docs.oracle.com/javase/8/docs/api/` option as well.
 */
-public class Pokemon extends Observable{
+public class Pokemon extends MyObservable{
 
     private int myHealth;  /** @invariant myHealth >=0 */
     private int myAttackPower; /** @invariant myAttackPower >= 0 */
@@ -103,7 +103,7 @@ public class Pokemon extends Observable{
     */
     public String toString() {
         String returnval = "";
-        returnval += "Pokemon " + myName + ":\n\thealth: " + myHealth + "\n\tattack: " + myAttackPower; //test this output
+        returnval += "Pokemon " + myName + ":\n\thealth: " + myHealth + "\n\tattack: " + myAttackPower;
         return returnval;
     }
 
