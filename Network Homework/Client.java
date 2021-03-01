@@ -1,7 +1,7 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
+//import java.util.concurrent.LinkedBlockingQueue;
 
 //import jdk.internal.jshell.tool.MessageHandler;
 
@@ -15,16 +15,21 @@ public class Client {
         InetAddress ip = InetAddress.getByName("localhost");
 
         //establish the connection
-        Socket socket = new Client(ip, serverPort);
+        Socket socket = new Socket(ip, serverPort);
 
         //get input and output streams
         DataInputStream dataIn = new DataInputStream(socket.getInputStream());
         DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream());
 
+        System.out.println("Enter a username: ");
+        String name = scan.nextLine();
+        dataOut.writeUTF(name);
+
         //create sendMessage thread
         Thread sendMessage = new Thread(new Runnable(){
             @Override
             public void run(){
+                //System.out.println("send message thread is running");
                 while(true){
                     //read the message to deliver
                     String msg = scan.nextLine();
@@ -39,6 +44,30 @@ public class Client {
             }
         });
         
+        Thread readMessage = new Thread(new Runnable(){
+            @Override
+            public void run(){
+                Boolean isRunning = true;
+                while(isRunning){
+                    //System.out.println("read message thread is running");
+                    try{
+                        //read the message sent to this client
+                        String msg = dataIn.readUTF();
+                        if(msg == "Bye")
+                            isRunning = false;
+                        else
+                            System.out.println(msg);
+                        //dataIn.flush();
+                        //System.out.println("Wrote message " + msg);
+                    } catch(IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        sendMessage.start();
+        readMessage.start();
     }
     // private Socket socket = null;
     // // private BufferedReader input = null;

@@ -9,14 +9,17 @@ import java.io.*;
 
 public class Server {
 
-    static Vector<ClientHandler> clientList = new Vector<>();
+    static ArrayList<ClientHandler> clientList = new ArrayList<>();
 
     static int clientCount = 0;
 
     public static void main(String args[]) throws IOException{
+        //create server socket broadcasting on port 5000
         ServerSocket myServer = new ServerSocket(5000);
 
         Socket socket;
+
+        System.out.println("Starting server...");
 
         //infinite loop for client request
         while(true){
@@ -30,19 +33,30 @@ public class Server {
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
             System.out.println("Creating client handler");
+            //myServer.writeUTF("Enter a username: ");
+
+            //output.writeUTF("Enter a username: ");
+            String name = input.readUTF();
 
             //Instantiate new handler object for request
-            ClientHandler currentClient = new ClientHandler(socket, "client " + clientCount, input, output);
+            ClientHandler currentClient = new ClientHandler(socket, name, input, output);
 
             //Instantiate a new Thread with the current client
             Thread thread = new Thread(currentClient);
 
-            System.out.println("Adding current client to active client list");
+            System.out.println("Welcome " + name);
             //add client to client list
             clientList.add(currentClient);
 
             //start the thread
             thread.start();
+
+            for(int i = 0; i < clientList.size(); i++){
+                if(Server.clientList.get(i).isLoggedIn){
+                    ClientHandler temp = Server.clientList.get(i);  
+                    temp.dataOut.writeUTF("Welcome " + name);
+                }
+            } 
 
             //increment client count
             clientCount++;
@@ -76,30 +90,45 @@ class ClientHandler implements Runnable {
             try{
                 received = dataIn.readUTF();
 
-                System.out.println(received);
-
                 if(received.equals("Bye")){
                     this.isLoggedIn = false;
+                    System.out.println("Server: Goodbye " + this.name);
+                    for(int i = 0; i < Server.clientList.size(); i++){
+                        //if we find the client, we write to the output stream
+                        if(Server.clientList.get(i).isLoggedIn){
+                            ClientHandler temp = Server.clientList.get(i);
+                            temp.dataOut.writeUTF("Server: Goodbye " + this.name);
+                        }
+                            //break;
+                        //}
+                    } 
                     this.socket.close();
+                    
+                    //Thread.currentThread().interrupt();
                     break;
                 }
 
-                //seperate string into message and clients
-                StringTokenizer strToken = new StringTokenizer(received, "#");
-                String msgToSend = strToken.nextToken();
-                String recipient = strToken.nextToken();
+                System.out.println(this.name + ": " + received);
 
+                //seperate string into message and clients
+                // StringTokenizer strToken = new StringTokenizer(received, "#");
+                // String msgToSend = strToken.nextToken();
+                // String recipient = strToken.nextToken();
+                //System.out.println("looping through clients");
                 //interate through recipients in client list
-                for(ClientHandler clients: Server.clientList){
+                for(int i = 0; i < Server.clientList.size(); i++){
                     //if we find the client, we write to the output stream
-                    if(clients.name.equals(recipient) && clients.isLoggedIn == true){
-                        clients.dataOut.writeUTF(this.name + " : " + msgToSend);
-                        break;
+                    if(Server.clientList.get(i).isLoggedIn){
+                        ClientHandler temp = Server.clientList.get(i);
+                        temp.dataOut.writeUTF(this.name + ": " + received);
                     }
-                }
+                        //break;
+                    //}
+                } 
+                //System.out.println("end of server loop");
             } catch(IOException e){
                 e.printStackTrace();
-            }
+            } 
         }//end of while
         try{
             //close in stream and out stream
