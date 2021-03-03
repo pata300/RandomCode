@@ -1,21 +1,39 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
-//import java.util.concurrent.LinkedBlockingQueue;
-
-//import jdk.internal.jshell.tool.MessageHandler;
 
 public class Client {
 
-    final static int serverPort = 5000;
+    static int serverPort = 5000;
     public static void main(String args[]) throws UnknownHostException, IOException{
         Scanner scan = new Scanner(System.in);
+        Socket socket;
 
-        //get ip address
-        InetAddress ip = InetAddress.getByName("localhost");
+        try{
+            InetAddress ip = InetAddress.getByName(args[0]);
+            serverPort = Integer.parseInt(args[1]);
+            //establish the connection
+            socket = new Socket(ip, serverPort);
+            //System.out.println("command line args used");
+        } catch(UnknownHostException e){
+            System.out.println("Not a valid hostname");
+            //get ip address
+            InetAddress ip = InetAddress.getByName("localhost");
 
-        //establish the connection
-        Socket socket = new Socket(ip, serverPort);
+            //establish the connection
+            socket = new Socket(ip, 5000);
+
+            System.out.println("catch socket was established instead");
+        } catch(ConnectException e){
+            System.out.println("Not a valid port number");
+            //get ip address
+            InetAddress ip = InetAddress.getByName(args[0]);
+
+            //establish the connection
+            socket = new Socket(ip, 5000);
+        }
+
+        
 
         //get input and output streams
         DataInputStream dataIn = new DataInputStream(socket.getInputStream());
@@ -53,15 +71,18 @@ public class Client {
                     try{
                         //read the message sent to this client
                         String msg = dataIn.readUTF();
-                        if(msg == "Bye")
+                        if(msg == "Bye") {
                             isRunning = false;
-                        else
+                            break;
+                        } else
                             System.out.println(msg);
                         //dataIn.flush();
                         //System.out.println("Wrote message " + msg);
                     } catch(IOException e){
-                        e.printStackTrace();
-                    }
+                        //System.out.println("client readMessage catch");
+                        isRunning = false;
+                        //e.printStackTrace();
+                    } 
                 }
             }
         });
@@ -69,121 +90,4 @@ public class Client {
         sendMessage.start();
         readMessage.start();
     }
-    // private Socket socket = null;
-    // // private BufferedReader input = null;
-    // // //private InputStream in = null;
-    // // private PrintWriter out = null;
-    // private ConnectionToServer server;
-    // private LinkedBlockingQueue<Object> messages;
-
-    // public Client(String address, int port) throws IOException {
-    //     socket = new Socket(address, port);
-    //     messages = new LinkedBlockingQueue<Object>();
-    //     server = new ConnectionToServer(socket);
-
-    //     System.out.println("Starting client");
-
-    //     Thread messageHandling = new Thread() {
-    //         public void run(){
-    //             while(true){
-    //                 try{
-    //                     Object message = messages.take();
-    //                     System.out.println("Message Received: " + message);
-    //                 } catch (InterruptedException e){
-
-    //                 }
-    //             }
-    //         }
-    //     };
-
-    //     messageHandling.setDaemon(true);
-    //     messageHandling.start();
-    // }
-
-    // private class ConnectionToServer{
-    //     ObjectInputStream in;
-    //     ObjectOutputStream out;
-    //     Socket socket;
-
-    //     ConnectionToServer(Socket socket) throws IOException {
-    //         this.socket = socket;
-    //         in = new ObjectInputStream(socket.getInputStream());
-    //         out = new ObjectOutputStream(socket.getOutputStream());
-
-    //         Thread read = new Thread(){
-    //             public void run(){
-    //                 while(true){
-    //                     try{
-    //                         Object obj = in.readObject();
-    //                         messages.put(obj);
-    //                     } catch(ClassNotFoundException e){
-    //                         e.printStackTrace();
-    //                     } catch(IOException e){
-    //                         e.printStackTrace();
-    //                     } catch(InterruptedException i){
-    //                         i.printStackTrace();
-    //                     }
-    //                 }
-    //             }
-    //         };
-
-    //         read.setDaemon(true);
-    //         read.start();
-    //     }
-
-    //     private void write(Object obj){
-    //         try{
-    //             out.writeObject(obj);
-    //         } catch(IOException e){
-    //             e.printStackTrace();
-    //         }
-    //     }
-    // }
-
-    // public void send(Object obj){
-    //     server.write(obj);
-    // }
-        // try{
-        //     socket = new Socket(address, port);
-        //     System.out.println("Connected");
-        //     input = new BufferedReader(new InputStreamReader(
-        //         socket.getInputStream()
-        //     ));
-
-        //     out = new PrintWriter(
-        //         socket.getOutputStream(), true);
-        // } catch (Exception e){
-        //     System.out.println("error " + e.getMessage());
-        // }
-
-        // Scanner scan = new Scanner(System.in);
-        // //System.out.println("Server : " + input.readLine());
-
-        // String line = "";
-        // while(!"Bye".equalsIgnoreCase(line)){
-        //     try{
-        //         System.out.println("Server : " + input.readLine());
-        //         line = scan.nextLine();
-        //         //System.out.println("Server : " + input.readLine());
-
-        //         out.println(line);
-        //         out.flush();
-
-                
-
-        //     } catch  (IOException i){
-        //         System.out.println(i);
-        //     }
-        // }
-
-        // try{
-        //     input.close();
-        //     out.close();
-        //     socket.close();
-        // } catch  (IOException i ){
-        //     System.out.println(i);
-        // }
-    //}
-
-    
-}
+  
